@@ -3,11 +3,11 @@
 Iremos usar duas Bibliotecas para utilizar o react-query
 
 ## Instalação:
-- instalação da biblioteca.
+- instalação do react-query.
 ```
   npm i @tanstack/react-query
 ```
-- instalação dos @Types.
+- instalação do axios.
 ```
   npm i axios
 ```
@@ -28,4 +28,25 @@ import { QueryClientProvider } from '@tanstack/react-query'
 <QueryClientProvider client={queryClient}>
   <RouterProvider router={router} />
 </QueryClientProvider>
+```
+
+## Para fazer requisições verbo POST, PUT e DELETE, devemos usar o hook useMutation.
+### Exemplo de utilização:
+```tsx
+export interface SignInBody {
+  email: string
+}
+export async function signIn({ email }: SignInBody) {
+  await api.post('/authenticate', { email })
+}
+
+```
+```tsx
+import { useMutation } from '@tanstack/react-query'
+import { signIn } from '@/api/sign-in'
+
+const { mutateAsync: authenticate } = useMutation({
+    //função axios para fazer a requisição.
+    mutationFn: signIn,
+  })
 ```
