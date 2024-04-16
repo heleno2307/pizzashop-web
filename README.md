@@ -33,6 +33,8 @@ import { QueryClientProvider } from '@tanstack/react-query'
 ### Exemplo de utilização:
 - Utilizando React-query
 ```tsx
+import { useQuery } from '@tanstack/react-query'
+
   const { data: managedRestaurant, isLoading: isLoadingManagedRestaurant } =
     useQuery({
       queryKey: ['managed-restaurant'],
@@ -46,6 +48,8 @@ import { QueryClientProvider } from '@tanstack/react-query'
 ### Exemplo de utilização:
 - Função Axios
 ```ts
+import { api } from '@/lib/axios'
+
 export interface SignInBody {
   email: string
 }
@@ -83,6 +87,10 @@ const handleSignIn = async (data: SingInFormType) => {
 ```
 ### Alterando uma requisição em cache
 ```tsx
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+
+const queryClient = useQueryClient()
+
 //função para atualizar o estado da requisição em cache.
 const updateManagedRestaurantCache = ({
     name,
@@ -116,6 +124,10 @@ const updateManagedRestaurantCache = ({
 ### Agora utilizando o conceito de interface otimista
 - Utilizando React-query
 ```tsx
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+
+const queryClient = useQueryClient()
+
 //função para atualizar o estado da requisição em cache.
 const updateManagedRestaurantCache = ({
     name,
