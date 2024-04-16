@@ -29,11 +29,23 @@ import { QueryClientProvider } from '@tanstack/react-query'
   <RouterProvider router={router} />
 </QueryClientProvider>
 ```
+## Para fazer uma requisição verbo GET.
+### Exemplo de utilização:
+- Utilizando React-query
+```tsx
+  const { data: managedRestaurant, isLoading: isLoadingManagedRestaurant } =
+    useQuery({
+      queryKey: ['managed-restaurant'],
+      queryFn: getManagedRestaurant,
 
+      // desativa revalidação de dados quando muda de aba.
+      staleTime: Infinity,
+    })
+```
 ## Para fazer requisições verbo POST, PUT e DELETE, devemos usar o hook useMutation.
 ### Exemplo de utilização:
 - Função Axios
-```tsx
+```ts
 export interface SignInBody {
   email: string
 }
@@ -69,6 +81,38 @@ const handleSignIn = async (data: SingInFormType) => {
     }
   }
 ```
+### Alterando uma requisição em cache
+```tsx
+//função para atualizar o estado da requisição em cache.
+const updateManagedRestaurantCache = ({
+    name,
+    description,
+  }: StoreProfileSchema) => {
+    const cached = queryClient.getQueryData<GetManagedRestaurantResponse>([
+      'managed-restaurant',
+    ])
+
+    if (cached) {
+      queryClient.setQueryData<GetManagedRestaurantResponse>(
+        ['managed-restaurant'],
+        {
+          ...cached,
+          name,
+          description,
+        },
+      )
+    }
+    // retorna todos os dados antes da mudança
+    return { cached }
+  }
+
+ const { mutateAsync: updateProfileFn } = useMutation({
+    mutationFn: updateProfile,
+    onSuccess(_,{description,name}){
+      updateManagedRestaurantCache({description,name})
+    }
+  })
+```
 ### Agora utilizando o conceito de interface otimista
 - Utilizando React-query
 ```tsx
@@ -97,7 +141,9 @@ const updateManagedRestaurantCache = ({
 
 //hook react query
 const { mutateAsync: updateProfileFn } = useMutation({
+    //função axios
     mutationFn: updateProfile,
+
     // Altera o cache da requisição sem ter certeza se a requisição foi um sucesso.
     onMutate({ description, name }) {
       const { cached } = updateManagedRestaurantCache({ description, name })
@@ -105,6 +151,7 @@ const { mutateAsync: updateProfileFn } = useMutation({
       //pega as informações antogas e disponibiliza no contexto da função.
       return { previusProfile: cached }
     },
+
     // Caso haja erro retorna as informações antigas para o cache da requisição.
     onError(_, __, context) {
       if (context?.previusProfile) {
