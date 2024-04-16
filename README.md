@@ -32,6 +32,7 @@ import { QueryClientProvider } from '@tanstack/react-query'
 
 ## Para fazer requisições verbo POST, PUT e DELETE, devemos usar o hook useMutation.
 ### Exemplo de utilização:
+- Função Axios
 ```tsx
 export interface SignInBody {
   email: string
@@ -41,6 +42,7 @@ export async function signIn({ email }: SignInBody) {
 }
 
 ```
+- Utilizando React-query para fazer 
 ```tsx
 import { useMutation } from '@tanstack/react-query'
 import { signIn } from '@/api/sign-in'
@@ -49,4 +51,80 @@ const { mutateAsync: authenticate } = useMutation({
     //função axios para fazer a requisição.
     mutationFn: signIn,
   })
+
+const handleSignIn = async (data: SingInFormType) => {
+    try {
+      // chamando a requisição
+      await authenticate({ email: data.email })
+      toast.success('Enviamos um link de autenticação para seu e-mail.', {
+        action: {
+          label: 'Reenviar',
+          onClick: () => handleSignIn(data),
+        },
+      })
+    } catch (error) {
+      toast.error('Erro ao realizar login')
+    } finally {
+      reset()
+    }
+  }
+```
+### Agora utilizando o conceito de interface otimista
+- Utilizando React-query
+```tsx
+//função para atualizar o estado da requisição em cache.
+const updateManagedRestaurantCache = ({
+    name,
+    description,
+  }: StoreProfileSchema) => {
+    const cached = queryClient.getQueryData<GetManagedRestaurantResponse>([
+      'managed-restaurant',
+    ])
+
+    if (cached) {
+      queryClient.setQueryData<GetManagedRestaurantResponse>(
+        ['managed-restaurant'],
+        {
+          ...cached,
+          name,
+          description,
+        },
+      )
+    }
+    // retorna todos os dados antes da mudança
+    return { cached }
+  }
+
+//hook react query
+const { mutateAsync: updateProfileFn } = useMutation({
+    mutationFn: updateProfile,
+    // Altera o cache da requisição sem ter certeza se a requisição foi um sucesso.
+    onMutate({ description, name }) {
+      const { cached } = updateManagedRestaurantCache({ description, name })
+
+      //pega as informações antogas e disponibiliza no contexto da função.
+      return { previusProfile: cached }
+    },
+    // Caso haja erro retorna as informações antigas para o cache da requisição.
+    onError(_, __, context) {
+      if (context?.previusProfile) {
+        updateManagedRestaurantCache(context.previusProfile)
+      }
+    },
+  })
+
+//Envio de formulário
+const handleSubmitProfile = async (data: StoreProfileSchema) => {
+    try {
+      //chamada função react query
+      await updateProfileFn({
+        description: data.description,
+        name: data.name,
+      })
+
+      toast.success('Perfil atualizado com sucesso!')
+    } catch {
+      toast.error('Falha ao autualizar o perfil tente novamente!')
+    }
+  }
 ```
