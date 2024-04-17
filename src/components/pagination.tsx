@@ -11,12 +11,14 @@ export interface PaginationProps {
   pageIndex: number
   totalCount: number
   perPage: number
+  onPageChenge: (pageIndex: number) => Promise<void> | void
 }
 
 export function Pagination({
   perPage,
   pageIndex,
   totalCount,
+  onPageChenge,
 }: PaginationProps) {
   const pages = Math.ceil(totalCount / perPage) || 1
   return (
@@ -29,20 +31,44 @@ export function Pagination({
           Pagina {pageIndex + 1} de {pages}
         </div>
         <div className="flex items-center gap-2">
-          <Button variant={'outline'} size={'xs'} className="h-8 w-8 p-0">
+          <Button
+            variant={'outline'}
+            size={'xs'}
+            className="h-8 w-8 p-0"
+            onClick={() => onPageChenge(0)}
+            disabled={pageIndex === 0}
+          >
             <ChevronsLeft className="h-4 w-4" />
             <span className="sr-only">Primeira pagina</span>
           </Button>
 
-          <Button variant={'outline'} size={'xs'} className="h-8 w-8 p-0">
+          <Button
+            variant={'outline'}
+            size={'xs'}
+            className="h-8 w-8 p-0"
+            onClick={() => onPageChenge(pageIndex - 1)}
+            disabled={pageIndex === 0}
+          >
             <ChevronLeft className="h-4 w-4" />
             <span className="sr-only">Pagina Anterior</span>
           </Button>
-          <Button variant={'outline'} size={'xs'} className="h-8 w-8 p-0">
+          <Button
+            variant={'outline'}
+            size={'xs'}
+            className="h-8 w-8 p-0"
+            onClick={() => onPageChenge(pageIndex + 1)}
+            disabled={pages <= pageIndex + 1}
+          >
             <ChevronRight className="h-4 w-4" />
             <span className="sr-only">Proxíma pagina</span>
           </Button>
-          <Button variant={'outline'} size={'xs'} className="h-8 w-8 p-0">
+          <Button
+            variant={'outline'}
+            size={'xs'}
+            className="h-8 w-8 p-0"
+            onClick={() => onPageChenge(pages - 1)}
+            disabled={pages <= pageIndex + 1}
+          >
             <ChevronsRight className="h-4 w-4" />
             <span className="sr-only">Ùltima pagina</span>
           </Button>

@@ -1,5 +1,9 @@
+import { useQuery } from '@tanstack/react-query'
 import { Helmet } from 'react-helmet-async'
+import { useSearchParams } from 'react-router-dom'
+import { z } from 'zod'
 
+import { getOrders } from '@/api/get-orders'
 import { Pagination } from '@/components/pagination'
 import {
   Table,
@@ -13,6 +17,35 @@ import { OrderTableFilters } from './order-table-filters'
 import { OrderTableRow } from './order-table-row'
 
 export function Orders() {
+  const [searchParams, setSearchParams] = useSearchParams()
+
+  const orderId = searchParams.get('orderId')
+  const customerName = searchParams.get('customerName')
+  const status = searchParams.get('status')
+
+  const pageIndex = z.coerce
+    .number()
+    .transform((page) => page - 1)
+    .parse(searchParams.get('page') ?? '1')
+
+  const { data: result } = useQuery({
+    queryKey: ['orders', pageIndex, orderId, customerName, status],
+    queryFn: () =>
+      getOrders({
+        pageIndex,
+        customerName,
+        orderId,
+        status: status === 'all' ? null : status,
+      }),
+  })
+
+  const handlePagination = (pageIndex: number) => {
+    console.log(pageIndex)
+    setSearchParams((state) => {
+      state.set('page', (pageIndex + 1).toString())
+      return state
+    })
+  }
   return (
     <>
       <Helmet title="Pedidos" />
@@ -35,14 +68,22 @@ export function Orders() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {Array.from({ length: 10 }).map((_, i) => {
-                  return <OrderTableRow key={i} />
-                })}
+                {result &&
+                  result.orders.map((order) => {
+                    return <OrderTableRow key={order.orderId} order={order} />
+                  })}
               </TableBody>
             </Table>
           </div>
         </div>
-        <Pagination pageIndex={0} totalCount={105} perPage={10} />
+        {result && (
+          <Pagination
+            pageIndex={result.meta.pageIndex}
+            totalCount={result.meta.totalCount}
+            perPage={result.meta.perPage}
+            onPageChenge={handlePagination}
+          />
+        )}
       </div>
     </>
   )
