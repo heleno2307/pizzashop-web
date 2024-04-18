@@ -38,11 +38,18 @@ export function DateRengePicker({
             {date?.from ? (
               date.to ? (
                 <>
-                  {format(date.from, 'LLL dd, y')} -{' '}
-                  {format(date.to, 'LLL dd, y')}
+                  {format(date.from, 'LLL dd, y', {
+                    locale: ptBR,
+                  })}{' '}
+                  -{' '}
+                  {format(date.to, 'LLL dd, y', {
+                    locale: ptBR,
+                  })}
                 </>
               ) : (
-                format(date.from, 'LLL dd, y')
+                format(date.from, 'LLL dd, y', {
+                  locale: ptBR,
+                })
               )
             ) : (
               <span>Pick a date</span>
