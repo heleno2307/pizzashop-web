@@ -71,7 +71,7 @@ export function SignIn() {
           <form className="space-y-4" onSubmit={handleSubmit(handleSignIn)}>
             <div className="space-y-2 ">
               <Label htmlFor="email">Seu e-mail</Label>
-              <Input id="emial" type="email" {...register('email')} />
+              <Input id="email" type="email" {...register('email')} />
             </div>
 
             <Button type="submit" className="w-full" disabled={isSubmitting}>
