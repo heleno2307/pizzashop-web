@@ -34,13 +34,13 @@ export function SingUp() {
     mutationFn: registerRestaurant,
   })
   const handleSingUp = async (data: SingUpFormType) => {
-    await registerRestaurantFn({
-      restaurantName: data.restaurantName,
-      email: data.email,
-      managerName: data.managerName,
-      phone: data.phone,
-    })
     try {
+      await registerRestaurantFn({
+        restaurantName: data.restaurantName,
+        email: data.email,
+        managerName: data.managerName,
+        phone: data.phone,
+      })
       toast.success('Restaurante cadastrado com sucesso.', {
         action: {
           label: 'Login',
