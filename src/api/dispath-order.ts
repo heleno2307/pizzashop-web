@@ -1,9 +1,9 @@
 import { api } from '@/lib/axios'
 
-interface DispatchOrderProps {
+export interface DispathOrderProps {
   orderId: string
 }
 
-export async function dispatchOrder({ orderId }: DispatchOrderProps) {
+export async function dispatchOrder({ orderId }: DispathOrderProps) {
   await api.patch(`/orders/${orderId}/dispatch`)
 }
